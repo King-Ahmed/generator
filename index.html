@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>KING Atmaca Generateur</title>
+</head>
+<body>
+    <h1>KING Atmaca Generateur</h1>
+    <button id="generateButton">Generer Grilles"re appuyez pour regenerer"</button>
+    <div id="results"></div>
+
+    <script>
+// Fonction pour générer les grilles
+function genererGrilles() {
+    var resultsDiv = document.getElementById("results");
+    resultsDiv.innerHTML = "";
+
+    // Charger les données depuis le fichier texte (utilisez le chemin correct)
+    fetch("https://king-ahmed.github.io/generator/euromillions.csv")
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Erreur de chargement du fichier.");
+            }
+            return response.text();
+        })
+        .then(data => {
+            // Code pour traiter les données ici
+            var lines = data.split('\n');
+            var numerosFrequents = [];
+            var etoilesFrequentes = [];
+
+            // Analyser les données du fichier texte
+            for (var i = 0; i < lines.length; i++) {
+                var values = lines[i].split(';');
+                for (var j = 0; j < 5; j++) {
+                    var numero = parseInt(values[j]);
+                    if (!isNaN(numero)) {
+                        numerosFrequents.push(numero);
+                    }
+                }
+                for (var j = 5; j < 7; j++) {
+                    var etoile = parseInt(values[j]);
+                    if (!isNaN(etoile)) {
+                        etoilesFrequentes.push(etoile);
+                    }
+                }
+            }
+
+            for (var i = 1; i <= 6; i++) {
+                var combinaisonNumeros = [];
+                for (var j = 0; j < 5; j++) {
+                    var numero;
+                    do {
+                        numero = numerosFrequents[Math.floor(Math.random() * numerosFrequents.length)];
+                    } while (combinaisonNumeros.includes(numero));
+                    combinaisonNumeros.push(numero);
+                }
+
+                var combinaisonEtoiles = [];
+                for (var j = 0; j < 2; j++) {
+                    var etoile;
+                    do {
+                        etoile = etoilesFrequentes[Math.floor(Math.random() * etoilesFrequentes.length)];
+                    } while (combinaisonEtoiles.includes(etoile));
+                    combinaisonEtoiles.push(etoile);
+                }
+
+                // Trier les numéros et les étoiles par ordre croissant
+                combinaisonNumeros.sort((a, b) => a - b);
+                combinaisonEtoiles.sort((a, b) => a - b);
+
+                var resultText = "Combinaison " + i + " generee :";
+                resultText += "<br>Numeros : " + combinaisonNumeros.join(", ");
+                resultText += "<br>Etoiles : " + combinaisonEtoiles.join(", ");
+                resultText += "<br><br>";
+
+                var resultElement = document.createElement("p");
+                resultElement.innerHTML = resultText;
+                resultsDiv.appendChild(resultElement);
+            }
+        })
+        .catch(error => {
+            console.error("Erreur : " + error);
+        });
+}
+
+
+        var generateButton = document.getElementById("generateButton");
+        generateButton.addEventListener("click", genererGrilles);
+    </script>
+</body>
+</html>
